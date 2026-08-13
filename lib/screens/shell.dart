@@ -46,21 +46,11 @@ class _AppShellState extends State<AppShell> {
     ];
 
     final body = AnimatedSwitcher(
-      duration: AppMotion.of(context, AppMotion.dSpatial),
-      switchInCurve: AppMotion.spatialEmphasized,
+      duration: AppMotion.of(context, AppMotion.dEffects),
+      switchInCurve: AppMotion.effects,
       switchOutCurve: AppMotion.effects,
-      transitionBuilder: (child, anim) {
-        return FadeTransition(
-          opacity: anim,
-          child: SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(0, 0.018),
-              end: Offset.zero,
-            ).animate(anim),
-            child: child,
-          ),
-        );
-      },
+      transitionBuilder: (child, anim) =>
+          FadeTransition(opacity: anim, child: child),
       child: KeyedSubtree(key: ValueKey(index), child: pages[index]),
     );
 

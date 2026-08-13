@@ -32,16 +32,10 @@ class IdroRipartoApp extends StatelessWidget {
           return DynamicColorBuilder(
             builder: (lightDynamic, darkDynamic) {
               final light = AppTheme.from(
-                AppTheme.schemeFor(
-                  Brightness.light,
-                  seed: lightDynamic?.primary,
-                ),
+                AppTheme.materialYou(lightDynamic, Brightness.light),
               );
               final dark = AppTheme.from(
-                AppTheme.schemeFor(
-                  Brightness.dark,
-                  seed: darkDynamic?.primary ?? lightDynamic?.primary,
-                ),
+                AppTheme.materialYou(darkDynamic, Brightness.dark),
               );
               return MaterialApp(
                 title: 'IdroRiparto',
@@ -57,9 +51,11 @@ class IdroRipartoApp extends StatelessWidget {
                   GlobalCupertinoLocalizations.delegate,
                 ],
                 home: AnimatedSwitcher(
-                  duration: AppMotion.dSpatial,
-                  switchInCurve: AppMotion.spatialEmphasized,
+                  duration: AppMotion.dEffects,
+                  switchInCurve: AppMotion.effects,
                   switchOutCurve: AppMotion.effects,
+                  transitionBuilder: (child, anim) =>
+                      FadeTransition(opacity: anim, child: child),
                   child: !store.ready
                       ? const _Boot(key: ValueKey('boot'))
                       : store.condominio == null

@@ -549,8 +549,8 @@ class UnitShareChart extends StatelessWidget {
                             ? 0
                             : (righe[i].totale / maxV).clamp(0, 1),
                       ),
-                      duration: AppMotion.of(context, AppMotion.dSlow),
-                      curve: AppMotion.spatialEmphasized,
+                      duration: AppMotion.of(context, AppMotion.dSpatial),
+                      curve: AppMotion.spatial,
                       builder: (context, t, _) {
                         return Stack(
                           children: [

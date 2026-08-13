@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// Seed di fallback Material 3 (quando il sistema non espone un accento).
+/// Seed solo se il sistema non offre Material You (web, desktop, Android < 12).
 const kFallbackSeed = Color(0xFF6750A4);
 
-/// Palette e tema derivati solo da [ColorScheme] (Material You / accento OS).
+/// Tinte per le unità: restano dentro la palette You, senza ruotare la tinta.
 class SchemeInk {
   static Color forUnit(ColorScheme s, String id) {
-    final hsl = HSLColor.fromColor(s.primary);
-    final step = id.hashCode.abs() % 8;
-    final hue = (hsl.hue + step * 39) % 360;
-    final sat = (hsl.saturation * 0.85 + 0.18).clamp(0.32, 0.72);
-    final light = s.brightness == Brightness.dark
-        ? (hsl.lightness.clamp(0.52, 0.72))
-        : (hsl.lightness.clamp(0.28, 0.46));
-    return hsl.withHue(hue).withSaturation(sat).withLightness(light).toColor();
+    final palette = <Color>[
+      s.primary,
+      s.tertiary,
+      s.secondary,
+      s.error,
+    ];
+    return palette[id.hashCode.abs() % palette.length];
   }
 }
 
@@ -22,22 +21,27 @@ class AppTheme {
   static const outfit = 'Outfit';
   static const fraunces = 'Fraunces';
 
-  static ColorScheme schemeFor(Brightness brightness, {Color? seed}) {
+  /// Material You vero: usa lo schema di sistema intero.
+  /// Non passare da [ColorScheme.fromSeed] + variante expressive:
+  /// quella ruota la tinta e cancella il wallpaper.
+  static ColorScheme materialYou(
+    ColorScheme? system,
+    Brightness brightness,
+  ) {
+    if (system != null) return system;
     return ColorScheme.fromSeed(
-      seedColor: seed ?? kFallbackSeed,
+      seedColor: kFallbackSeed,
       brightness: brightness,
-      dynamicSchemeVariant: DynamicSchemeVariant.expressive,
+      dynamicSchemeVariant: DynamicSchemeVariant.tonalSpot,
     );
   }
 
   static ThemeData from(ColorScheme scheme) {
     final isDark = scheme.brightness == Brightness.dark;
     final text = textTheme(scheme);
-    final pill = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(999),
-    );
+    const pill = StadiumBorder();
     final xl = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(28),
+      borderRadius: BorderRadius.circular(32),
     );
     return ThemeData(
       useMaterial3: true,
@@ -48,6 +52,16 @@ class AppTheme {
       scaffoldBackgroundColor: scheme.surface,
       splashFactory: InkRipple.splashFactory,
       visualDensity: VisualDensity.standard,
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: ZoomPageTransitionsBuilder(),
+          TargetPlatform.iOS: ZoomPageTransitionsBuilder(),
+          TargetPlatform.macOS: ZoomPageTransitionsBuilder(),
+          TargetPlatform.linux: ZoomPageTransitionsBuilder(),
+          TargetPlatform.windows: ZoomPageTransitionsBuilder(),
+          TargetPlatform.fuchsia: ZoomPageTransitionsBuilder(),
+        },
+      ),
       appBarTheme: AppBarTheme(
         backgroundColor: scheme.surface,
         foregroundColor: scheme.onSurface,
@@ -100,20 +114,20 @@ class AppTheme {
         style: FilledButton.styleFrom(
           backgroundColor: scheme.primary,
           foregroundColor: scheme.onPrimary,
-          minimumSize: const Size(48, 52),
-          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
+          minimumSize: const Size(48, 56),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape: pill,
-          textStyle: vf(outfit, 15, 580, scheme.onPrimary),
+          textStyle: vf(outfit, 16, 600, scheme.onPrimary),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: scheme.onSurface,
-          minimumSize: const Size(48, 52),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          minimumSize: const Size(48, 56),
+          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
           shape: pill,
           side: BorderSide(color: scheme.outline),
-          textStyle: vf(outfit, 15, 560, scheme.onSurface),
+          textStyle: vf(outfit, 16, 560, scheme.onSurface),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
@@ -128,7 +142,7 @@ class AppTheme {
         foregroundColor: scheme.onPrimaryContainer,
         elevation: 0,
         highlightElevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         extendedTextStyle: vf(outfit, 15, 580, scheme.onPrimaryContainer),
       ),
       navigationBarTheme: NavigationBarThemeData(
@@ -136,12 +150,12 @@ class AppTheme {
         indicatorColor: scheme.secondaryContainer,
         indicatorShape: pill,
         elevation: 0,
-        height: 80,
+        height: 84,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         iconTheme: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
           return IconThemeData(
-            size: selected ? 26 : 24,
+            size: selected ? 28 : 24,
             color: selected
                 ? scheme.onSecondaryContainer
                 : scheme.onSurfaceVariant,
@@ -190,7 +204,7 @@ class AppTheme {
       segmentedButtonTheme: SegmentedButtonThemeData(
         style: ButtonStyle(
           visualDensity: VisualDensity.comfortable,
-          shape: WidgetStatePropertyAll(pill),
+          shape: const WidgetStatePropertyAll(pill),
         ),
       ),
     );
@@ -198,10 +212,10 @@ class AppTheme {
 
   static TextTheme textTheme(ColorScheme s) {
     return TextTheme(
-      displayLarge: display(s, 42, wght: 620, opsz: 48),
-      displayMedium: display(s, 32, wght: 600, opsz: 36),
-      headlineMedium: display(s, 26, wght: 600, opsz: 28),
-      headlineSmall: display(s, 22, wght: 580, opsz: 24),
+      displayLarge: display(s, 44, wght: 700, opsz: 48),
+      displayMedium: display(s, 34, wght: 680, opsz: 36),
+      headlineMedium: display(s, 28, wght: 660, opsz: 28),
+      headlineSmall: display(s, 22, wght: 640, opsz: 24),
       titleLarge: vf(outfit, 20, 640, s.onSurface, ls: -0.2),
       titleMedium: vf(outfit, 16, 580, s.onSurface),
       titleSmall: vf(outfit, 14, 580, s.onSurface),
@@ -222,13 +236,13 @@ class AppTheme {
     return TextStyle(
       fontFamily: fraunces,
       fontSize: size,
-      height: 1.12,
-      letterSpacing: -0.6,
+      height: 1.1,
+      letterSpacing: -0.7,
       color: s.onSurface,
       fontVariations: [
         FontVariation('wght', wght),
         FontVariation('opsz', opsz),
-        const FontVariation('SOFT', 35),
+        const FontVariation('SOFT', 40),
       ],
     );
   }

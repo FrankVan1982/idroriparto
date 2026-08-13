@@ -166,8 +166,8 @@ class SettingsScreen extends StatelessWidget {
                         'in assenza di contatori, consumo effettivo quando i sottocontatori '
                         'sono installati, e criterio misto (quota fissa + m³ + parti comuni) '
                         'quando l’assemblea lo delibera.\n\n'
-                        'I colori seguono il sistema (Material You su Android 12+, '
-                        'tema chiaro/scuro del dispositivo). '
+                        'Su Android 12+ i colori sono quelli di Material You '
+                        '(sfondo e accento del telefono), usati così come li dà il sistema. '
                         'I dati restano sul dispositivo. Non è un parere legale: il regolamento '
                         'contrattuale o una delibera possono imporre un criterio diverso.',
                       ),

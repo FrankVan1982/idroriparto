@@ -401,7 +401,7 @@ class _BillsBars extends StatelessWidget {
                           context,
                           Duration(milliseconds: 520 + i * 70),
                         ),
-                        curve: AppMotion.spatialEmphasized,
+                        curve: AppMotion.spatial,
                         builder: (context, t, _) {
                           return FractionallySizedBox(
                             heightFactor: t,
