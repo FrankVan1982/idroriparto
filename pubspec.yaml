@@ -22,6 +22,21 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/brand/logo_source.png
+  adaptive_icon_background: "#F6F2EA"
+  adaptive_icon_foreground: assets/brand/logo_source.png
+  adaptive_icon_monochrome: assets/brand/logo_mono.png
+  min_sdk_android: 24
+  web:
+    generate: true
+    image_path: assets/brand/logo_source.png
+    background_color: "#F6F2EA"
+    theme_color: "#0B3D42"
 
 flutter:
   uses-material-design: true

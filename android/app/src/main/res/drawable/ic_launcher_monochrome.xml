@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Silhouette per icone a tema Material You (Android 13+).
+     Bianco su trasparente: il sistema la tinge con i colori del wallpaper. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="
+            M54,14
+            C54,14 29,48 29,67
+            C29,81.5 40,92 54,92
+            C68,92 79,81.5 79,67
+            C79,48 54,14 54,14 Z
+            M54,40 L42,54 L42,80 L66,80 L66,54 Z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M47,58 h5 v5 h-5 z M56,58 h5 v5 h-5 z M47,67 h5 v5 h-5 z" />
+</vector>
