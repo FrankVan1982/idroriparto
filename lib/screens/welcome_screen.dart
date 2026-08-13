@@ -86,9 +86,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       );
     }
     return Scaffold(
-      body: ListView(
-        children: [hero, form],
-      ),
+      body: ListView(children: [hero, form]),
     );
   }
 }
@@ -115,9 +113,7 @@ class _HeroPanel extends StatelessWidget {
               child: Text(
                 'L’acqua del condominio,\nripagata con chiarezza.',
                 style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                  color: AppColorsSafe.onHero,
-                  fontSize: 34,
-                  height: 1.12,
+                  color: scheme.onPrimary,
                 ),
               ),
             ),
@@ -128,7 +124,7 @@ class _HeroPanel extends StatelessWidget {
                 'Millesimi, sottocontatori, quote fisse e parti comuni. '
                 'Un prospetto pronto per l’assemblea, in un’app che resta sul dispositivo.',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: AppColorsSafe.onHeroMuted,
+                  color: scheme.onPrimary.withValues(alpha: 0.88),
                   height: 1.5,
                 ),
               ),
@@ -150,11 +146,11 @@ class _HeroPanel extends StatelessWidget {
             const SizedBox(height: 18),
             Appear(
               index: 4,
-              child: FilledButton.tonal(
+              child: FilledButton(
                 onPressed: onDemo,
                 style: FilledButton.styleFrom(
-                  backgroundColor: scheme.primaryContainer,
-                  foregroundColor: scheme.onPrimaryContainer,
+                  backgroundColor: scheme.onPrimary,
+                  foregroundColor: scheme.primary,
                 ),
                 child: const Text('Apri l’esempio di Milano'),
               ),
@@ -165,27 +161,11 @@ class _HeroPanel extends StatelessWidget {
       ),
     );
 
-    return ColoredBox(
-      color: const Color(0xFF0B3D42),
-      child: Stack(
-        fit: fill ? StackFit.expand : StackFit.loose,
-        children: [
-          const Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: WaterRibbon(height: 72, light: false),
-          ),
-          fill ? Positioned.fill(child: content) : content,
-        ],
-      ),
+    return Material(
+      color: scheme.primary,
+      child: fill ? SizedBox.expand(child: content) : content,
     );
   }
-}
-
-class AppColorsSafe {
-  static const onHero = Color(0xFFF7F3EA);
-  static const onHeroMuted = Color(0xFFE4DDD0);
 }
 
 class _Tag extends StatelessWidget {
@@ -194,18 +174,21 @@ class _Tag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+    final scheme = Theme.of(context).colorScheme;
+    return DecoratedBox(
       decoration: BoxDecoration(
-        color: const Color(0x22F7F3EA),
+        color: scheme.onPrimary.withValues(alpha: 0.14),
         borderRadius: BorderRadius.circular(999),
       ),
-      child: Text(
-        text,
-        style: const TextStyle(
-          color: Color(0xFFF7F3EA),
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        child: Text(
+          text,
+          style: TextStyle(
+            color: scheme.onPrimary,
+            fontSize: 12,
+            fontVariations: const [FontVariation('wght', 580)],
+          ),
         ),
       ),
     );
@@ -338,7 +321,9 @@ class _FormPanel extends StatelessWidget {
                                       Text(
                                         m.titolo,
                                         style: TextStyle(
-                                          fontWeight: FontWeight.w700,
+                                          fontVariations: const [
+                                            FontVariation('wght', 680),
+                                          ],
                                           color: metodo == m
                                               ? scheme.onSecondaryContainer
                                               : scheme.onSurface,

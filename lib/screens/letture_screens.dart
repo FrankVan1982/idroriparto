@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../data/store.dart';
-import '../theme/app_theme.dart';
 import '../utils/format.dart';
 import '../theme/motion.dart';
 import '../widgets/widgets.dart';
@@ -214,7 +213,10 @@ class _LetturaBulkScreenState extends State<LetturaBulkScreen> {
                   },
                   child: Row(
                     children: [
-                      const Icon(Icons.event, color: AppColors.teal),
+                      Icon(
+                        Icons.event,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(

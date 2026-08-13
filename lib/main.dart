@@ -1,3 +1,4 @@
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -28,29 +29,45 @@ class IdroRipartoApp extends StatelessWidget {
       child: ListenableBuilder(
         listenable: store,
         builder: (context, _) {
-          return MaterialApp(
-            title: 'IdroRiparto',
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.light,
-            darkTheme: AppTheme.dark,
-            themeMode: store.themeMode,
-            locale: const Locale('it', 'IT'),
-            supportedLocales: const [Locale('it', 'IT'), Locale('en')],
-            localizationsDelegates: const [
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            home: AnimatedSwitcher(
-              duration: AppMotion.dSpatial,
-              switchInCurve: AppMotion.spatialEmphasized,
-              switchOutCurve: AppMotion.effects,
-              child: !store.ready
-                  ? const _Boot(key: ValueKey('boot'))
-                  : store.condominio == null
-                  ? const WelcomeScreen(key: ValueKey('welcome'))
-                  : const AppShell(key: ValueKey('shell')),
-            ),
+          return DynamicColorBuilder(
+            builder: (lightDynamic, darkDynamic) {
+              final light = AppTheme.from(
+                AppTheme.schemeFor(
+                  Brightness.light,
+                  seed: lightDynamic?.primary,
+                ),
+              );
+              final dark = AppTheme.from(
+                AppTheme.schemeFor(
+                  Brightness.dark,
+                  seed: darkDynamic?.primary ?? lightDynamic?.primary,
+                ),
+              );
+              return MaterialApp(
+                title: 'IdroRiparto',
+                debugShowCheckedModeBanner: false,
+                theme: light,
+                darkTheme: dark,
+                themeMode: store.themeMode,
+                locale: const Locale('it', 'IT'),
+                supportedLocales: const [Locale('it', 'IT'), Locale('en')],
+                localizationsDelegates: const [
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
+                home: AnimatedSwitcher(
+                  duration: AppMotion.dSpatial,
+                  switchInCurve: AppMotion.spatialEmphasized,
+                  switchOutCurve: AppMotion.effects,
+                  child: !store.ready
+                      ? const _Boot(key: ValueKey('boot'))
+                      : store.condominio == null
+                      ? const WelcomeScreen(key: ValueKey('welcome'))
+                      : const AppShell(key: ValueKey('shell')),
+                ),
+              );
+            },
           );
         },
       ),
@@ -65,7 +82,6 @@ class _Boot extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Center(
         child: Appear(
           child: Column(

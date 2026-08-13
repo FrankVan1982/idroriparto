@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 
 import '../data/store.dart';
 import '../models/models.dart';
-import '../theme/app_theme.dart';
 import '../theme/motion.dart';
 import '../widgets/widgets.dart';
 
@@ -132,7 +131,10 @@ class SettingsScreen extends StatelessWidget {
                       ),
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        leading: const Icon(Icons.delete_forever_outlined, color: AppColors.coral),
+                        leading: Icon(
+                          Icons.delete_forever_outlined,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
                         title: const Text('Azzera tutto'),
                         onTap: () async {
                           final ok = await _confirm(
@@ -164,6 +166,8 @@ class SettingsScreen extends StatelessWidget {
                         'in assenza di contatori, consumo effettivo quando i sottocontatori '
                         'sono installati, e criterio misto (quota fissa + m³ + parti comuni) '
                         'quando l’assemblea lo delibera.\n\n'
+                        'I colori seguono il sistema (Material You su Android 12+, '
+                        'tema chiaro/scuro del dispositivo). '
                         'I dati restano sul dispositivo. Non è un parere legale: il regolamento '
                         'contrattuale o una delibera possono imporre un criterio diverso.',
                       ),

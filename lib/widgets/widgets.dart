@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'dart:ui' show FontFeature;
 
 import 'package:flutter/material.dart';
@@ -73,8 +72,8 @@ class AppCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final card = Card(
-      color: color,
+    final card = Card.filled(
+      color: color ?? Theme.of(context).colorScheme.surfaceContainerLow,
       child: Padding(padding: padding, child: child),
     );
     if (onTap == null) return card;
@@ -99,19 +98,19 @@ class MetricTile extends StatelessWidget {
     required this.value,
     this.hint,
     this.icon,
-    this.accent,
+    this.tone,
   });
 
   final String label;
   final String value;
   final String? hint;
   final IconData? icon;
-  final Color? accent;
+  final Color? tone;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final c = accent ?? scheme.primary;
+    final c = tone ?? scheme.primary;
     return AppCard(
       color: scheme.surfaceContainerLowest,
       child: Column(
@@ -125,10 +124,10 @@ class MetricTile extends StatelessWidget {
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: c.withValues(alpha: 0.14),
+                    color: scheme.primaryContainer,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(icon, size: 18, color: c),
+                  child: Icon(icon, size: 18, color: scheme.onPrimaryContainer),
                 ),
                 const SizedBox(width: 8),
               ],
@@ -150,6 +149,7 @@ class MetricTile extends StatelessWidget {
               value,
               maxLines: 1,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                color: c,
                 fontFeatures: const [FontFeature.tabularFigures()],
               ),
             ),
@@ -169,7 +169,6 @@ class MetricTile extends StatelessWidget {
   }
 }
 
-/// Griglia che si adatta all'altezza del contenuto: niente overflow di 1–2 px.
 class MetricGrid extends StatelessWidget {
   const MetricGrid({super.key, required this.children});
   final List<Widget> children;
@@ -179,7 +178,7 @@ class MetricGrid extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, box) {
         final cols = box.maxWidth > 720 ? 4 : 2;
-        final gap = 12.0;
+        const gap = 12.0;
         final w = (box.maxWidth - gap * (cols - 1)) / cols;
         return Wrap(
           spacing: gap,
@@ -237,7 +236,8 @@ class InternoAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColors.forUnit(unita.id);
+    final scheme = Theme.of(context).colorScheme;
+    final c = SchemeInk.forUnit(scheme, unita.id);
     return AnimatedContainer(
       duration: AppMotion.of(context, AppMotion.dSpatial),
       curve: AppMotion.spatial,
@@ -245,7 +245,7 @@ class InternoAvatar extends StatelessWidget {
       height: size,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: c.withValues(alpha: 0.16),
+        color: c.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(size * 0.34),
       ),
       child: Text(
@@ -253,8 +253,8 @@ class InternoAvatar extends StatelessWidget {
         maxLines: 1,
         style: TextStyle(
           color: c,
-          fontWeight: FontWeight.w700,
           fontSize: size * 0.34,
+          fontVariations: const [FontVariation('wght', 680)],
         ),
       ),
     );
@@ -299,8 +299,8 @@ class StatusPill extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: c,
-                    fontWeight: FontWeight.w600,
                     fontSize: 12,
+                    fontVariations: const [FontVariation('wght', 580)],
                   ),
                 ),
               ),
@@ -320,43 +320,42 @@ class WarningBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     if (messages.isEmpty) return const SizedBox.shrink();
     final scheme = Theme.of(context).colorScheme;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: scheme.tertiaryContainer,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.info_outline, size: 18, color: scheme.onTertiaryContainer),
-              const SizedBox(width: 8),
-              Expanded(
+    return Material(
+      color: scheme.tertiaryContainer,
+      borderRadius: BorderRadius.circular(20),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.info_outline, size: 18, color: scheme.onTertiaryContainer),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Da verificare',
+                    style: TextStyle(
+                      color: scheme.onTertiaryContainer,
+                      fontVariations: const [FontVariation('wght', 680)],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            for (final m in messages)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
                 child: Text(
-                  'Da verificare',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
+                  '· $m',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: scheme.onTertiaryContainer,
                   ),
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          for (final m in messages)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: Text(
-                '· $m',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: scheme.onTertiaryContainer,
-                ),
-              ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -517,10 +516,10 @@ class UnitShareChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (righe.isEmpty) return const SizedBox.shrink();
+    final scheme = Theme.of(context).colorScheme;
     final maxV = righe
         .map((e) => e.totale)
         .fold<double>(0, (a, b) => a > b ? a : b);
-    final track = Theme.of(context).colorScheme.surfaceContainerHighest;
     return Column(
       children: [
         for (var i = 0; i < righe.length; i++)
@@ -537,7 +536,9 @@ class UnitShareChart extends StatelessWidget {
                       righe[i].interno,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontWeight: FontWeight.w700),
+                      style: const TextStyle(
+                        fontVariations: [FontVariation('wght', 680)],
+                      ),
                     ),
                   ),
                   Expanded(
@@ -556,7 +557,7 @@ class UnitShareChart extends StatelessWidget {
                             Container(
                               height: 22,
                               decoration: BoxDecoration(
-                                color: track,
+                                color: scheme.surfaceContainerHighest,
                                 borderRadius: BorderRadius.circular(999),
                               ),
                             ),
@@ -565,7 +566,10 @@ class UnitShareChart extends StatelessWidget {
                               child: Container(
                                 height: 22,
                                 decoration: BoxDecoration(
-                                  color: AppColors.forUnit(righe[i].unitaId),
+                                  color: SchemeInk.forUnit(
+                                    scheme,
+                                    righe[i].unitaId,
+                                  ),
                                   borderRadius: BorderRadius.circular(999),
                                 ),
                               ),
@@ -585,7 +589,7 @@ class UnitShareChart extends StatelessWidget {
                       textAlign: TextAlign.right,
                       style: const TextStyle(
                         fontFeatures: [FontFeature.tabularFigures()],
-                        fontWeight: FontWeight.w600,
+                        fontVariations: [FontVariation('wght', 580)],
                         fontSize: 13,
                       ),
                     ),
@@ -609,7 +613,7 @@ class StatoChip extends StatelessWidget {
     final color = switch (stato) {
       StatoBolletta.bozza => scheme.onSurfaceVariant,
       StatoBolletta.calcolata => scheme.primary,
-      StatoBolletta.chiusa => AppColors.sage,
+      StatoBolletta.chiusa => scheme.tertiary,
     };
     return StatusPill(label: stato.label, color: color);
   }
@@ -650,94 +654,4 @@ class MaxWidth extends StatelessWidget {
       ),
     );
   }
-}
-
-/// Nastro d'acqua: il dettaglio da screenshot (huashu: una firma, non ovunque).
-class WaterRibbon extends StatefulWidget {
-  const WaterRibbon({super.key, this.height = 56, this.light = true});
-  final double height;
-  final bool light;
-
-  @override
-  State<WaterRibbon> createState() => _WaterRibbonState();
-}
-
-class _WaterRibbonState extends State<WaterRibbon>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _c;
-
-  @override
-  void initState() {
-    super.initState();
-    _c = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 8),
-    )..repeat();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (AppMotion.reduce(context)) {
-      _c.stop();
-    } else if (!_c.isAnimating) {
-      _c.repeat();
-    }
-  }
-
-  @override
-  void dispose() {
-    _c.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: widget.height,
-      width: double.infinity,
-      child: AnimatedBuilder(
-        animation: _c,
-        builder: (context, _) {
-          return CustomPaint(
-            painter: _WavePainter(t: _c.value, light: widget.light),
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _WavePainter extends CustomPainter {
-  _WavePainter({required this.t, required this.light});
-  final double t;
-  final bool light;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final a = Paint()
-      ..color = (light ? const Color(0x66D8EFED) : const Color(0x338FD4CF));
-    final b = Paint()
-      ..color = (light ? const Color(0x448FD4CF) : const Color(0x228FD4CF));
-    canvas.drawPath(_wave(size, t, 10, 1.6), a);
-    canvas.drawPath(_wave(size, t + 0.35, 7, 2.1), b);
-  }
-
-  Path _wave(Size size, double phase, double amp, double freq) {
-    final p = Path()..moveTo(0, size.height);
-    for (var x = 0.0; x <= size.width; x += 4) {
-      final y =
-          size.height * 0.55 +
-          math.sin((x / size.width * freq * math.pi * 2) + phase * math.pi * 2) *
-              amp;
-      p.lineTo(x, y);
-    }
-    p
-      ..lineTo(size.width, size.height)
-      ..close();
-    return p;
-  }
-
-  @override
-  bool shouldRepaint(covariant _WavePainter old) => old.t != t;
 }

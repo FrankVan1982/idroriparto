@@ -21,100 +21,82 @@ class DashboardScreen extends StatelessWidget {
     final last = store.ultimaBolletta;
     final rip = last == null ? null : store.ripartoDi(last.id);
     final scheme = Theme.of(context).colorScheme;
+    final millOff =
+        (store.sommaMillesimi - c.millesimiRiferimento).abs() > 0.05;
 
     return CustomScrollView(
       slivers: [
         SliverToBoxAdapter(
-          child: ColoredBox(
-            color: const Color(0xFF0B3D42),
-            child: Stack(
-              children: [
-                const Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  child: WaterRibbon(height: 64, light: false),
-                ),
-                SafeArea(
-                  bottom: false,
-                  child: MaxWidth(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Appear(
-                            child: Text(
-                              greetingFor(DateTime.now()),
-                              style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(
-                                    color: const Color(0xFFE8C27A),
-                                    letterSpacing: 0.3,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+          child: Material(
+            color: scheme.primary,
+            child: SafeArea(
+              bottom: false,
+              child: MaxWidth(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Appear(
+                        child: Text(
+                          greetingFor(DateTime.now()),
+                          style: Theme.of(context).textTheme.labelLarge
+                              ?.copyWith(color: scheme.onPrimary),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Appear(
+                        index: 1,
+                        child: Text(
+                          c.nome,
+                          style: Theme.of(context).textTheme.displayMedium
+                              ?.copyWith(color: scheme.onPrimary),
+                        ),
+                      ),
+                      if (c.indirizzoCompleto.isNotEmpty) ...[
+                        const SizedBox(height: 6),
+                        Appear(
+                          index: 2,
+                          child: Text(
+                            c.indirizzoCompleto,
+                            style: TextStyle(
+                              color: scheme.onPrimary.withValues(alpha: 0.88),
                             ),
                           ),
-                          const SizedBox(height: 6),
-                          Appear(
-                            index: 1,
-                            child: Text(
-                              c.nome,
-                              style: Theme.of(context).textTheme.displayMedium
-                                  ?.copyWith(color: const Color(0xFFF7F3EA)),
+                        ),
+                      ],
+                      const SizedBox(height: 20),
+                      Appear(
+                        index: 3,
+                        child: Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            _Quick(
+                              icon: Icons.speed,
+                              label: 'Nuova lettura',
+                              onTap: () =>
+                                  pushApp(context, const LetturaBulkScreen()),
                             ),
-                          ),
-                          if (c.indirizzoCompleto.isNotEmpty) ...[
-                            const SizedBox(height: 6),
-                            Appear(
-                              index: 2,
-                              child: Text(
-                                c.indirizzoCompleto,
-                                style: const TextStyle(
-                                  color: Color(0xFFE4DDD0),
-                                ),
-                              ),
+                            _Quick(
+                              icon: Icons.receipt_long,
+                              label: 'Nuova bolletta',
+                              onTap: () =>
+                                  pushApp(context, const BollettaFormScreen()),
+                            ),
+                            _Quick(
+                              icon: Icons.add_home_work_outlined,
+                              label: 'Aggiungi unità',
+                              onTap: () =>
+                                  pushApp(context, const UnitaFormScreen()),
                             ),
                           ],
-                          const SizedBox(height: 20),
-                          Appear(
-                            index: 3,
-                            child: Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: [
-                                _Quick(
-                                  icon: Icons.speed,
-                                  label: 'Nuova lettura',
-                                  onTap: () => pushApp(
-                                    context,
-                                    const LetturaBulkScreen(),
-                                  ),
-                                ),
-                                _Quick(
-                                  icon: Icons.receipt_long,
-                                  label: 'Nuova bolletta',
-                                  onTap: () => pushApp(
-                                    context,
-                                    const BollettaFormScreen(),
-                                  ),
-                                ),
-                                _Quick(
-                                  icon: Icons.add_home_work_outlined,
-                                  label: 'Aggiungi unità',
-                                  onTap: () => pushApp(
-                                    context,
-                                    const UnitaFormScreen(),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
           ),
         ),
@@ -136,17 +118,11 @@ class DashboardScreen extends StatelessWidget {
                       MetricTile(
                         label: 'Millesimi',
                         value: mill(store.sommaMillesimi),
-                        hint:
-                            store.sommaMillesimi == c.millesimiRiferimento
-                            ? 'Allineati a ${mill(c.millesimiRiferimento)}'
-                            : 'Attesi ${mill(c.millesimiRiferimento)}',
+                        hint: millOff
+                            ? 'Attesi ${mill(c.millesimiRiferimento)}'
+                            : 'Allineati a ${mill(c.millesimiRiferimento)}',
                         icon: Icons.pie_chart_outline,
-                        accent:
-                            (store.sommaMillesimi - c.millesimiRiferimento)
-                                    .abs() >
-                                0.05
-                            ? AppColors.amber
-                            : scheme.primary,
+                        tone: millOff ? scheme.error : scheme.primary,
                       ),
                       MetricTile(
                         label: 'Ultima bolletta',
@@ -155,14 +131,14 @@ class DashboardScreen extends StatelessWidget {
                             ? 'Nessuna registrata'
                             : periodLabel(last.periodoDal, last.periodoAl),
                         icon: Icons.payments_outlined,
-                        accent: AppColors.amber,
+                        tone: scheme.tertiary,
                       ),
                       MetricTile(
                         label: 'Metodo',
                         value: c.metodoDefault.label,
                         hint: 'Predefinito del condominio',
                         icon: Icons.balance,
-                        accent: AppColors.sage,
+                        tone: scheme.secondary,
                       ),
                     ],
                   ),
@@ -187,10 +163,15 @@ class DashboardScreen extends StatelessWidget {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    periodLabel(last.periodoDal, last.periodoAl),
+                                    periodLabel(
+                                      last.periodoDal,
+                                      last.periodoAl,
+                                    ),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
-                                    style: Theme.of(context).textTheme.titleLarge,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.titleLarge,
                                   ),
                                 ),
                                 const SizedBox(width: 8),
@@ -209,7 +190,10 @@ class DashboardScreen extends StatelessWidget {
                               parts: [
                                 for (final r in rip.righe)
                                   (
-                                    color: AppColors.forUnit(r.unitaId),
+                                    color: SchemeInk.forUnit(
+                                      scheme,
+                                      r.unitaId,
+                                    ),
                                     value: r.totale,
                                   ),
                               ],
@@ -221,7 +205,11 @@ class DashboardScreen extends StatelessWidget {
                               children: [
                                 _kv(context, 'Totale', euro(rip.totaleGenerale)),
                                 _kv(context, 'Consumi', mc(rip.sommaConsumi)),
-                                _kv(context, 'Parti comuni', mc(rip.consumoComune)),
+                                _kv(
+                                  context,
+                                  'Parti comuni',
+                                  mc(rip.consumoComune),
+                                ),
                                 _kv(context, '€ / m³', euro(rip.prezzoMedioMc)),
                               ],
                             ),
@@ -247,10 +235,10 @@ class DashboardScreen extends StatelessWidget {
                     const SizedBox(height: 28),
                   ],
                   const SectionLabel('Come funziona il riparto misto'),
-                  Appear(
+                  const Appear(
                     child: AppCard(
                       child: Column(
-                        children: const [
+                        children: [
                           _How(
                             n: '1',
                             t: 'Quote fisse',
@@ -286,11 +274,11 @@ class DashboardScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Text(k, style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
         Text(
-          k,
-          style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant),
+          v,
+          style: const TextStyle(fontVariations: [FontVariation('wght', 680)]),
         ),
-        Text(v, style: const TextStyle(fontWeight: FontWeight.w700)),
       ],
     );
   }
@@ -304,29 +292,20 @@ class _Quick extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: const Color(0x22F7F3EA),
-      borderRadius: BorderRadius.circular(999),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(999),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, color: const Color(0xFFF7F3EA), size: 18),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: Color(0xFFF7F3EA),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
+    final scheme = Theme.of(context).colorScheme;
+    return FilledButton.tonal(
+      onPressed: onTap,
+      style: FilledButton.styleFrom(
+        backgroundColor: scheme.onPrimary.withValues(alpha: 0.16),
+        foregroundColor: scheme.onPrimary,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 18),
+          const SizedBox(width: 8),
+          Text(label),
+        ],
       ),
     );
   }
@@ -351,7 +330,7 @@ class _How extends StatelessWidget {
             n,
             style: TextStyle(
               color: scheme.onPrimaryContainer,
-              fontWeight: FontWeight.w700,
+              fontVariations: const [FontVariation('wght', 680)],
               fontSize: 13,
             ),
           ),
@@ -361,7 +340,12 @@ class _How extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(t, style: const TextStyle(fontWeight: FontWeight.w700)),
+              Text(
+                t,
+                style: const TextStyle(
+                  fontVariations: [FontVariation('wght', 680)],
+                ),
+              ),
               Text(d, style: Theme.of(context).textTheme.bodySmall),
             ],
           ),
@@ -425,9 +409,7 @@ class _BillsBars extends StatelessWidget {
                             child: DecoratedBox(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(999),
-                                color: scheme.primary.withValues(
-                                  alpha: 0.55 + 0.45 * t,
-                                ),
+                                color: scheme.primary,
                               ),
                             ),
                           );

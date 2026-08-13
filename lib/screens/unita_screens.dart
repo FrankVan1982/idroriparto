@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../data/store.dart';
 import '../models/models.dart';
-import '../theme/app_theme.dart';
 import '../utils/format.dart';
 import '../utils/ids.dart';
 import '../theme/motion.dart';
@@ -217,13 +216,13 @@ class UnitaDetailScreen extends StatelessWidget {
                                       ? 'Sfitto'
                                       : '${u.occupanti} occupanti',
                                   color: u.sfitto
-                                      ? AppColors.amber
-                                      : AppColors.sage,
+                                      ? Theme.of(context).colorScheme.tertiary
+                                      : Theme.of(context).colorScheme.primary,
                                 ),
                                 if (u.haContatore)
                                   StatusPill(
                                     label: u.matricola ?? 'Contatore',
-                                    color: AppColors.teal,
+                                    color: Theme.of(context).colorScheme.primary,
                                     icon: Icons.speed,
                                   ),
                               ],
@@ -251,9 +250,11 @@ class UnitaDetailScreen extends StatelessWidget {
                             trailing: i < letture.length - 1
                                 ? Text(
                                     '+ ${mcNum(letture[i].valore - letture[i + 1].valore)} m³',
-                                    style: const TextStyle(
-                                      color: AppColors.teal,
-                                      fontWeight: FontWeight.w600,
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.primary,
+                                      fontVariations: const [
+                                        FontVariation('wght', 580),
+                                      ],
                                     ),
                                   )
                                 : null,

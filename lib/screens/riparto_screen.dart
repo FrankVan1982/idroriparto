@@ -5,7 +5,6 @@ import '../data/store.dart';
 import '../models/models.dart';
 import '../services/pdf_service.dart';
 import '../services/riparto_engine.dart';
-import '../theme/app_theme.dart';
 import '../utils/format.dart';
 import '../theme/motion.dart';
 import '../widgets/widgets.dart';
@@ -84,7 +83,7 @@ class RipartoScreen extends StatelessWidget {
                       value: mcShort.format(rip.consumoComune),
                       hint: 'm³ perdite / giardino',
                       icon: Icons.yard_outlined,
-                      accent: AppColors.amber,
+                      tone: Theme.of(context).colorScheme.tertiary,
                     ),
                     MetricTile(
                       label: 'Prezzo medio',

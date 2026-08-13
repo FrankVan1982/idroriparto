@@ -1,137 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// Token di marca. Un solo accento (teal mediterraneo) su carta calda.
-/// Vietato #0D1117 + neon. I testi usano onSurface / onSurfaceVariant a contrasto AA.
-class AppColors {
-  static const deep = Color(0xFF0B3D42);
-  static const teal = Color(0xFF0C5C59);
-  static const aqua = Color(0xFF1A8F8A);
-  static const foam = Color(0xFFD8EFED);
-  static const paper = Color(0xFFF3EEE4);
-  static const ivory = Color(0xFFFFFCF6);
-  static const sand = Color(0xFFE4D6C0);
-  static const ink = Color(0xFF122026);
-  static const inkSoft = Color(0xFF3E5458);
-  static const coral = Color(0xFF9B3A34);
-  static const amber = Color(0xFF8A5A18);
-  static const sage = Color(0xFF2F5A38);
-  static const creamOnDark = Color(0xFFF4EFE4);
+/// Seed di fallback Material 3 (quando il sistema non espone un accento).
+const kFallbackSeed = Color(0xFF6750A4);
 
-  /// Palette unità: tinte scure, leggibili su contenitore chiaro.
-  static const unitPalette = <Color>[
-    Color(0xFF0C5C59),
-    Color(0xFF185A86),
-    Color(0xFF8A5A18),
-    Color(0xFF5E3F86),
-    Color(0xFF9B3A34),
-    Color(0xFF2F5A38),
-    Color(0xFF0B3D42),
-    Color(0xFF8A4B28),
-    Color(0xFF1F6B74),
-    Color(0xFF6B4038),
-  ];
-
-  static Color forUnit(String id) {
-    final h = id.hashCode.abs();
-    return unitPalette[h % unitPalette.length];
+/// Palette e tema derivati solo da [ColorScheme] (Material You / accento OS).
+class SchemeInk {
+  static Color forUnit(ColorScheme s, String id) {
+    final hsl = HSLColor.fromColor(s.primary);
+    final step = id.hashCode.abs() % 8;
+    final hue = (hsl.hue + step * 39) % 360;
+    final sat = (hsl.saturation * 0.85 + 0.18).clamp(0.32, 0.72);
+    final light = s.brightness == Brightness.dark
+        ? (hsl.lightness.clamp(0.52, 0.72))
+        : (hsl.lightness.clamp(0.28, 0.46));
+    return hsl.withHue(hue).withSaturation(sat).withLightness(light).toColor();
   }
-
-  @Deprecated('Usa ColorScheme.onSurfaceVariant')
-  static const muted = inkSoft;
-
-  @Deprecated('Usa ColorScheme.outlineVariant')
-  static const line = Color(0xFFD4DCD8);
 }
 
 class AppTheme {
   static const outfit = 'Outfit';
   static const fraunces = 'Fraunces';
 
-  static ThemeData get light {
-    const scheme = ColorScheme(
-      brightness: Brightness.light,
-      primary: AppColors.teal,
-      onPrimary: Colors.white,
-      primaryContainer: Color(0xFFC6E8E5),
-      onPrimaryContainer: Color(0xFF063532),
-      secondary: AppColors.deep,
-      onSecondary: Colors.white,
-      secondaryContainer: Color(0xFFD4E4E2),
-      onSecondaryContainer: Color(0xFF0B2C30),
-      tertiary: AppColors.amber,
-      onTertiary: Colors.white,
-      tertiaryContainer: Color(0xFFF3E0C0),
-      onTertiaryContainer: Color(0xFF3D2706),
-      error: AppColors.coral,
-      onError: Colors.white,
-      errorContainer: Color(0xFFF8D6D3),
-      onErrorContainer: Color(0xFF4A1512),
-      surface: AppColors.ivory,
-      onSurface: AppColors.ink,
-      onSurfaceVariant: AppColors.inkSoft,
-      surfaceContainerLowest: Color(0xFFFFFDF9),
-      surfaceContainerLow: Color(0xFFFAF6EE),
-      surfaceContainer: Color(0xFFF3EEE4),
-      surfaceContainerHigh: Color(0xFFEBE4D8),
-      surfaceContainerHighest: Color(0xFFE4DCD0),
-      outline: Color(0xFF7A8A88),
-      outlineVariant: Color(0xFFC9D3D1),
-      shadow: Color(0xFF000000),
-      scrim: Color(0xFF000000),
-      inverseSurface: Color(0xFF1C2E31),
-      onInverseSurface: AppColors.creamOnDark,
-      inversePrimary: Color(0xFF8FD4CF),
-    );
-    return _base(scheme).copyWith(scaffoldBackgroundColor: AppColors.paper);
-  }
-
-  static ThemeData get dark {
-    // Scuro caldo (pino), non GitHub-dark.
-    const scheme = ColorScheme(
-      brightness: Brightness.dark,
-      primary: Color(0xFF8FD4CF),
-      onPrimary: Color(0xFF053330),
-      primaryContainer: Color(0xFF0C5C59),
-      onPrimaryContainer: Color(0xFFD6F3F0),
-      secondary: Color(0xFFE4D6C0),
-      onSecondary: Color(0xFF2A2114),
-      secondaryContainer: Color(0xFF2A3E41),
-      onSecondaryContainer: Color(0xFFE8F1F0),
-      tertiary: Color(0xFFE8C27A),
-      onTertiary: Color(0xFF3A2808),
-      tertiaryContainer: Color(0xFF5A3D12),
-      onTertiaryContainer: Color(0xFFF8E7C4),
-      error: Color(0xFFFFB4AB),
-      onError: Color(0xFF4A1512),
-      errorContainer: Color(0xFF7A2A26),
-      onErrorContainer: Color(0xFFFFDAD6),
-      surface: Color(0xFF1C2E31),
-      onSurface: Color(0xFFF2F4F2),
-      onSurfaceVariant: Color(0xFFC5D2D0),
-      surfaceContainerLowest: Color(0xFF121F21),
-      surfaceContainerLow: Color(0xFF182628),
-      surfaceContainer: Color(0xFF1E3033),
-      surfaceContainerHigh: Color(0xFF26383B),
-      surfaceContainerHighest: Color(0xFF2E4245),
-      outline: Color(0xFF8A9A98),
-      outlineVariant: Color(0xFF3D5154),
-      shadow: Color(0xFF000000),
-      scrim: Color(0xFF000000),
-      inverseSurface: Color(0xFFE8E6DE),
-      onInverseSurface: Color(0xFF1C2E31),
-      inversePrimary: AppColors.teal,
-    );
-    return _base(scheme).copyWith(
-      scaffoldBackgroundColor: const Color(0xFF152326),
+  static ColorScheme schemeFor(Brightness brightness, {Color? seed}) {
+    return ColorScheme.fromSeed(
+      seedColor: seed ?? kFallbackSeed,
+      brightness: brightness,
+      dynamicSchemeVariant: DynamicSchemeVariant.expressive,
     );
   }
 
-  static ThemeData _base(ColorScheme scheme) {
+  static ThemeData from(ColorScheme scheme) {
     final isDark = scheme.brightness == Brightness.dark;
-    final text = _textTheme(scheme);
-    final stadium = RoundedRectangleBorder(
+    final text = textTheme(scheme);
+    final pill = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(999),
+    );
+    final xl = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(28),
     );
     return ThemeData(
       useMaterial3: true,
@@ -139,10 +45,11 @@ class AppTheme {
       colorScheme: scheme,
       fontFamily: outfit,
       textTheme: text,
+      scaffoldBackgroundColor: scheme.surface,
       splashFactory: InkRipple.splashFactory,
       visualDensity: VisualDensity.standard,
       appBarTheme: AppBarTheme(
-        backgroundColor: Colors.transparent,
+        backgroundColor: scheme.surface,
         foregroundColor: scheme.onSurface,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -153,25 +60,23 @@ class AppTheme {
         titleTextStyle: text.titleLarge,
       ),
       cardTheme: CardThemeData(
-        color: scheme.surfaceContainerLowest,
+        color: scheme.surfaceContainerLow,
         elevation: 0,
         margin: EdgeInsets.zero,
         clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
-        ),
+        shape: xl,
       ),
       chipTheme: ChipThemeData(
         side: BorderSide.none,
-        backgroundColor: scheme.surfaceContainerHigh,
+        backgroundColor: scheme.surfaceContainerHighest,
         selectedColor: scheme.secondaryContainer,
         labelStyle: text.labelLarge?.copyWith(color: scheme.onSurface),
-        shape: stadium,
+        shape: pill,
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: scheme.surfaceContainerLow,
+        fillColor: scheme.surfaceContainerHighest,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
           borderSide: BorderSide(color: scheme.outlineVariant),
@@ -188,8 +93,8 @@ class AppTheme {
           horizontal: 16,
           vertical: 16,
         ),
-        labelStyle: TextStyle(color: scheme.onSurfaceVariant),
-        hintStyle: TextStyle(color: scheme.onSurfaceVariant),
+        labelStyle: vf(outfit, 14, 460, scheme.onSurfaceVariant),
+        hintStyle: vf(outfit, 14, 400, scheme.onSurfaceVariant),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
@@ -197,12 +102,8 @@ class AppTheme {
           foregroundColor: scheme.onPrimary,
           minimumSize: const Size(48, 52),
           padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
-          shape: stadium,
-          textStyle: const TextStyle(
-            fontFamily: outfit,
-            fontWeight: FontWeight.w600,
-            fontSize: 15,
-          ),
+          shape: pill,
+          textStyle: vf(outfit, 15, 580, scheme.onPrimary),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -210,14 +111,16 @@ class AppTheme {
           foregroundColor: scheme.onSurface,
           minimumSize: const Size(48, 52),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          shape: stadium,
+          shape: pill,
           side: BorderSide(color: scheme.outline),
+          textStyle: vf(outfit, 15, 560, scheme.onSurface),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: scheme.primary,
           minimumSize: const Size(48, 44),
+          textStyle: vf(outfit, 14, 560, scheme.primary),
         ),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
@@ -226,12 +129,12 @@ class AppTheme {
         elevation: 0,
         highlightElevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-        extendedSizeConstraints: const BoxConstraints(minHeight: 56),
+        extendedTextStyle: vf(outfit, 15, 580, scheme.onPrimaryContainer),
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: scheme.surfaceContainer,
         indicatorColor: scheme.secondaryContainer,
-        indicatorShape: stadium,
+        indicatorShape: pill,
         elevation: 0,
         height: 80,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
@@ -246,41 +149,28 @@ class AppTheme {
         }),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
-          return TextStyle(
-            fontFamily: outfit,
-            fontSize: 12,
-            fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-            color: selected ? scheme.onSurface : scheme.onSurfaceVariant,
+          return vf(
+            outfit,
+            12,
+            selected ? 650 : 480,
+            selected ? scheme.onSurface : scheme.onSurfaceVariant,
           );
         }),
       ),
       navigationRailTheme: NavigationRailThemeData(
         backgroundColor: scheme.surfaceContainerLow,
         indicatorColor: scheme.secondaryContainer,
-        indicatorShape: stadium,
+        indicatorShape: pill,
         selectedIconTheme: IconThemeData(color: scheme.onSecondaryContainer),
         unselectedIconTheme: IconThemeData(color: scheme.onSurfaceVariant),
-        selectedLabelTextStyle: TextStyle(
-          fontFamily: outfit,
-          fontWeight: FontWeight.w700,
-          color: scheme.onSurface,
-        ),
-        unselectedLabelTextStyle: TextStyle(
-          fontFamily: outfit,
-          color: scheme.onSurfaceVariant,
-        ),
+        selectedLabelTextStyle: vf(outfit, 12, 650, scheme.onSurface),
+        unselectedLabelTextStyle: vf(outfit, 12, 460, scheme.onSurfaceVariant),
       ),
-      dividerTheme: DividerThemeData(
-        color: scheme.outlineVariant,
-        space: 1,
-      ),
+      dividerTheme: DividerThemeData(color: scheme.outlineVariant, space: 1),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
         backgroundColor: scheme.inverseSurface,
-        contentTextStyle: TextStyle(
-          fontFamily: outfit,
-          color: scheme.onInverseSurface,
-        ),
+        contentTextStyle: vf(outfit, 14, 460, scheme.onInverseSurface),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       dialogTheme: DialogThemeData(
@@ -297,92 +187,67 @@ class AppTheme {
         iconColor: scheme.onSurfaceVariant,
         textColor: scheme.onSurface,
       ),
+      segmentedButtonTheme: SegmentedButtonThemeData(
+        style: ButtonStyle(
+          visualDensity: VisualDensity.comfortable,
+          shape: WidgetStatePropertyAll(pill),
+        ),
+      ),
     );
   }
 
-  static TextTheme _textTheme(ColorScheme scheme) {
+  static TextTheme textTheme(ColorScheme s) {
     return TextTheme(
-      displayLarge: TextStyle(
-        fontFamily: fraunces,
-        fontSize: 42,
-        height: 1.08,
-        fontWeight: FontWeight.w600,
-        letterSpacing: -1.1,
-        color: scheme.onSurface,
-      ),
-      displayMedium: TextStyle(
-        fontFamily: fraunces,
-        fontSize: 32,
-        height: 1.12,
-        fontWeight: FontWeight.w600,
-        letterSpacing: -0.7,
-        color: scheme.onSurface,
-      ),
-      headlineMedium: TextStyle(
-        fontFamily: fraunces,
-        fontSize: 26,
-        height: 1.18,
-        fontWeight: FontWeight.w600,
-        letterSpacing: -0.3,
-        color: scheme.onSurface,
-      ),
-      headlineSmall: TextStyle(
-        fontFamily: fraunces,
-        fontSize: 22,
-        height: 1.2,
-        fontWeight: FontWeight.w600,
-        color: scheme.onSurface,
-      ),
-      titleLarge: TextStyle(
-        fontFamily: outfit,
-        fontSize: 20,
-        fontWeight: FontWeight.w700,
-        letterSpacing: -0.2,
-        color: scheme.onSurface,
-      ),
-      titleMedium: TextStyle(
-        fontFamily: outfit,
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-        color: scheme.onSurface,
-      ),
-      titleSmall: TextStyle(
-        fontFamily: outfit,
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: scheme.onSurface,
-      ),
-      bodyLarge: TextStyle(
-        fontFamily: outfit,
-        fontSize: 16,
-        height: 1.45,
-        color: scheme.onSurface,
-      ),
-      bodyMedium: TextStyle(
-        fontFamily: outfit,
-        fontSize: 14,
-        height: 1.45,
-        color: scheme.onSurface,
-      ),
-      bodySmall: TextStyle(
-        fontFamily: outfit,
-        fontSize: 12.5,
-        height: 1.4,
-        color: scheme.onSurfaceVariant,
-      ),
-      labelLarge: TextStyle(
-        fontFamily: outfit,
-        fontSize: 13.5,
-        fontWeight: FontWeight.w600,
-        color: scheme.onSurface,
-      ),
-      labelMedium: TextStyle(
-        fontFamily: outfit,
-        fontSize: 12,
-        fontWeight: FontWeight.w600,
-        letterSpacing: 0.4,
-        color: scheme.onSurfaceVariant,
-      ),
+      displayLarge: display(s, 42, wght: 620, opsz: 48),
+      displayMedium: display(s, 32, wght: 600, opsz: 36),
+      headlineMedium: display(s, 26, wght: 600, opsz: 28),
+      headlineSmall: display(s, 22, wght: 580, opsz: 24),
+      titleLarge: vf(outfit, 20, 640, s.onSurface, ls: -0.2),
+      titleMedium: vf(outfit, 16, 580, s.onSurface),
+      titleSmall: vf(outfit, 14, 580, s.onSurface),
+      bodyLarge: vf(outfit, 16, 430, s.onSurface, height: 1.45),
+      bodyMedium: vf(outfit, 14, 430, s.onSurface, height: 1.45),
+      bodySmall: vf(outfit, 12.5, 430, s.onSurfaceVariant, height: 1.4),
+      labelLarge: vf(outfit, 13.5, 580, s.onSurface),
+      labelMedium: vf(outfit, 12, 560, s.onSurfaceVariant, ls: 0.4),
+    );
+  }
+
+  static TextStyle display(
+    ColorScheme s,
+    double size, {
+    required double wght,
+    required double opsz,
+  }) {
+    return TextStyle(
+      fontFamily: fraunces,
+      fontSize: size,
+      height: 1.12,
+      letterSpacing: -0.6,
+      color: s.onSurface,
+      fontVariations: [
+        FontVariation('wght', wght),
+        FontVariation('opsz', opsz),
+        const FontVariation('SOFT', 35),
+      ],
+    );
+  }
+
+  static TextStyle vf(
+    String family,
+    double size,
+    double wght,
+    Color color, {
+    double height = 1.25,
+    double ls = 0,
+  }) {
+    return TextStyle(
+      fontFamily: family,
+      fontSize: size,
+      height: height,
+      letterSpacing: ls,
+      color: color,
+      fontVariations: [FontVariation('wght', wght)],
     );
   }
 }
